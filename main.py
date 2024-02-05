@@ -8,11 +8,11 @@ from langchain import PromptTemplate
 from langchain_openai import ChatOpenAI
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
 
+dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 pdf_file = os.getenv("PDF_FILE_PATH")
 #print(bot_token)
-dotenv.load_dotenv()
 
 #Load PDF documents
 loader = PyPDFLoader(pdf_file)

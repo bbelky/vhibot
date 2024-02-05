@@ -12,7 +12,6 @@ dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 pdf_file = os.getenv("PDF_FILE_PATH")
-#print(bot_token)
 
 #Load PDF documents
 loader = PyPDFLoader(pdf_file)
@@ -29,7 +28,7 @@ chatbot = RetrievalQA.from_chain_type(
         temperature=0, model_name="gpt-3.5-turbo", max_tokens=500
     ),
     chain_type="stuff",
-    retriever=FAISS.load_local("faiss_vhissp_docs", OpenAIEmbeddings())
+    retriever=FAISS.load_local("faiss_vhi_docs", OpenAIEmbeddings())
         .as_retriever(search_type="similarity", search_kwargs={"k":1})
 )
 
@@ -57,7 +56,7 @@ async def handle_message(update, context):
   answer = chatbot.invoke( 
     prompt.format(query=message)
   )
-  await update.message.reply_text("Question:\n" + message + "\n" + "Answer:\n" + answer)
+  await update.message.reply_text("Question:\n" + message + "\n" + "Answer:\n" + answer.get('result'))
 
 #Polling Telegram bot
 def main() -> None:

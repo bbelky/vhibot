@@ -33,7 +33,7 @@ chatbot = RetrievalQA.from_chain_type(
 )
 
 template = """
-{query} Respons with an example. 
+{query} Respond with an example. 
 """
 
 prompt = PromptTemplate( 

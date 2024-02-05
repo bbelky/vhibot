@@ -1,5 +1,5 @@
 import os
-import dotenv
+#import dotenv
 from langchain_openai import OpenAIEmbeddings 
 from langchain_community.vectorstores import FAISS 
 from langchain_community.document_loaders import PyPDFLoader
@@ -8,7 +8,8 @@ from langchain import PromptTemplate
 from langchain_openai import ChatOpenAI
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
 
-dotenv.load_dotenv()
+#Load local environment variables if needed:
+#dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 pdf_file = os.getenv("PDF_FILE_PATH")

@@ -1,0 +1,5 @@
+services:
+  web:
+    image: "vporokhov/vhibot"
+    env_file:
+      - .env

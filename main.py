@@ -84,7 +84,7 @@ async def handle_message(update, context):
     prompt.format(query=message)
   )
   #await update.message.reply_text("Question:\n" + message + "\n" + "Answer:\n" + answer.get('result'))
-  await update.message.reply_text(answer.get('result'))
+  await update.message.reply_html(answer.get('result'))
 
 #Polling Telegram bot
 def main() -> None:

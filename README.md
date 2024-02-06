@@ -12,6 +12,6 @@ Create .env file in your working directory with the following content:
 
 Run docker compose:
 
-    docker compose up -d
+    docker compose pull && docker compose up -d
 
 Enjoy.

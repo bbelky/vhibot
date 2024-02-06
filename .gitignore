@@ -1,3 +1,6 @@
+# Specific 
+faiss_vhi_docs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

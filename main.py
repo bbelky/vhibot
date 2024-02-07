@@ -10,7 +10,7 @@ from langchain_openai import ChatOpenAI
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
 
 #Load local environment variables for local tests or comment for production:
-dotenv.load_dotenv()
+#dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 model_name = os.getenv("MODEL_NAME")

@@ -10,7 +10,7 @@ from langchain_openai import ChatOpenAI
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
 
 #Load local environment variables for local tests or comment for production:
-#dotenv.load_dotenv()
+dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 model_name = os.getenv("MODEL_NAME")
@@ -35,7 +35,7 @@ chatbot = RetrievalQA.from_chain_type(
     ),
     chain_type="stuff",
     retriever=FAISS.load_local("faiss_vhi_docs", OpenAIEmbeddings())
-        .as_retriever(search_type="similarity", search_kwargs={"k":1})
+        .as_retriever(search_type="similarity", search_kwargs={"k":2})
 )
 
 template = """
@@ -67,7 +67,8 @@ async def docs_command(update, context):
         "<a href='https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_6_0_compute_api_reference/index.html'>Compute API Reference</a>\n"
         "<a href='https://docs.virtuozzo.com/virtuozzo_integrations_acronis_cyber_cloud_migration_from_vmware/index.html'>VMware Migration with Acronis Cyber Cloud</a>\n"
         "<a href='https://docs.virtuozzo.com/virtuozzo_integrations_hystax_migration_from_vmware/index.html'>VMware Migration with Hystax</a>\n"
-        "<a href='https://docs.virtuozzo.com/master/index.html'>All documentation</a>",
+        "<a href='https://docs.virtuozzo.com/virtuozzo_advisory_archive/virtuozzo-hybrid-infrastructure/index.html#virtuozzo-hybrid-infrastructure'>Release Notes</a>\n",
+        "<a href='https://docs.virtuozzo.com/master/index.html'>All documentation</a>\n",
     )
 
 async def support_command(update, context):
@@ -88,8 +89,9 @@ async def handle_message(update, context):
   answer = chatbot.invoke( 
     prompt.format(query=message)
   )
+  answer_formatted = answer.get('result').replace("<", "&lt;").replace(">", "&gt;")          
   #await update.message.reply_text("Question:\n" + message + "\n" + "Answer:\n" + answer.get('result'))
-  await update.message.reply_html(answer.get('result'))
+  await update.message.reply_html(answer_formatted)
 
 #Polling Telegram bot
 def main() -> None:

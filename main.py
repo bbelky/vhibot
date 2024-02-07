@@ -3,20 +3,25 @@ import dotenv
 from langchain_openai import OpenAIEmbeddings 
 from langchain_community.vectorstores import FAISS 
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders.merge import MergedDataLoader
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
 
 #Load local environment variables for local tests or comment for production:
-#dotenv.load_dotenv()
+dotenv.load_dotenv()
 bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
-pdf_file = os.getenv("PDF_FILE_PATH")
+model_name = os.getenv("MODEL_NAME")
+pdf_file1 = os.getenv("PDF_FILE1_PATH")
+pdf_file2 = os.getenv("PDF_FILE2_PATH")
 
 #Load PDF documents
-loader = PyPDFLoader(pdf_file)
-pages = loader.load_and_split()
+loader1 = PyPDFLoader(pdf_file1)
+loader2 = PyPDFLoader(pdf_file2)
+loader_all = MergedDataLoader(loaders=[loader1, loader2])
+pages = loader_all.load_and_split()
 
 #Create FAISS DB
 faissindex = FAISS.from_documents(pages, OpenAIEmbeddings())
@@ -26,7 +31,7 @@ faissindex.save_local("faiss_vhi_docs")
 chatbot = RetrievalQA.from_chain_type( 
     llm=ChatOpenAI(
         openai_api_key=openai_token,
-        temperature=0, model_name="gpt-3.5-turbo", max_tokens=500
+        temperature=0, model_name=model_name, max_tokens=500
     ),
     chain_type="stuff",
     retriever=FAISS.load_local("faiss_vhi_docs", OpenAIEmbeddings())

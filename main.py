@@ -67,8 +67,8 @@ async def docs_command(update, context):
         "<a href='https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_6_0_compute_api_reference/index.html'>Compute API Reference</a>\n"
         "<a href='https://docs.virtuozzo.com/virtuozzo_integrations_acronis_cyber_cloud_migration_from_vmware/index.html'>VMware Migration with Acronis Cyber Cloud</a>\n"
         "<a href='https://docs.virtuozzo.com/virtuozzo_integrations_hystax_migration_from_vmware/index.html'>VMware Migration with Hystax</a>\n"
-        "<a href='https://docs.virtuozzo.com/virtuozzo_advisory_archive/virtuozzo-hybrid-infrastructure/index.html#virtuozzo-hybrid-infrastructure'>Release Notes</a>\n",
-        "<a href='https://docs.virtuozzo.com/master/index.html'>All documentation</a>\n",
+        "<a href='https://docs.virtuozzo.com/virtuozzo_advisory_archive/virtuozzo-hybrid-infrastructure/index.html#virtuozzo-hybrid-infrastructure'>Release Notes</a>\n"
+        "<a href='https://docs.virtuozzo.com/master/index.html'>All documentation</a>",
     )
 
 async def support_command(update, context):

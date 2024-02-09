@@ -52,7 +52,7 @@ faissindex.save_local("faiss_vhi_docs")
 chatbot = RetrievalQA.from_chain_type( 
     llm=ChatOpenAI(
         openai_api_key=openai_token,
-        temperature=0, model_name=model_name, max_tokens=600
+        temperature=0.2, model_name=model_name, max_tokens=600
     ),
     chain_type="stuff",
     retriever=FAISS.load_local("faiss_vhi_docs", OpenAIEmbeddings())

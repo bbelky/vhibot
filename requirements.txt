@@ -10,3 +10,5 @@ langchain-openai
 certifi
 langchain
 python-telegram-bot
+requests
+jq

@@ -7,10 +7,11 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders.merge import MergedDataLoader
+from langchain_community.callbacks import get_openai_callback
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Application
+from telegram.ext import CommandHandler, MessageHandler, filters, Application
 
 #Load local environment variables
 dotenv.load_dotenv()
@@ -52,15 +53,15 @@ faissindex.save_local("faiss_vhi_docs")
 chatbot = RetrievalQA.from_chain_type( 
     llm=ChatOpenAI(
         openai_api_key=openai_token,
-        temperature=0.2, model_name=model_name, max_tokens=600
+        temperature=0, model_name=model_name, max_tokens=600
     ),
     chain_type="stuff",
     retriever=FAISS.load_local("faiss_vhi_docs", OpenAIEmbeddings())
-        .as_retriever(search_type="similarity", search_kwargs={"k":2})
+        .as_retriever(search_type="similarity", search_kwargs={"k":1})
 )
 
 template = """
-{query} Respond with an example and a link to the documentation. 
+{query} Respond with an example if possible. Add a link to the documentation. 
 """
 
 prompt = PromptTemplate( 
@@ -114,10 +115,11 @@ async def handle_message(update, context):
   chat_id = update.message.chat_id
   user = update.message.from_user
   first_name = user.first_name
-
-  answer = chatbot.invoke( 
-    prompt.format(query=message)
-  )
+  with get_openai_callback() as cb:
+    answer = chatbot.invoke( 
+      prompt.format(query=message)
+    )
+  print(cb)
   answer_formatted = answer.get('result').replace("<", "&lt;").replace(">", "&gt;")          
   #await update.message.reply_text("Question:\n" + message + "\n" + "Answer:\n" + answer.get('result'))
   await update.message.reply_html(answer_formatted)

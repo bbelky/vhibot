@@ -78,6 +78,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.handlers = []
 logger.addHandler(handler)
+logger.info('bot_start') 
 
 print("READY")
 
@@ -153,7 +154,6 @@ async def handle_message(update, context):
   print(cb)
 
   #betterstack logs
-  #logger.error('Something bad happened.')
   logger.info('question', extra={
     'user': user['username'],
     'prompt': message,

@@ -1,5 +1,9 @@
 services:
-  web:
+  telegram:
     image: "vporokhov/vhibot"
     env_file:
       - .env
+  webserver:
+    image: "vporokhov/webserver"
+    ports:
+      - 5555:5555

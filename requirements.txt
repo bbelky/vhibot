@@ -12,3 +12,5 @@ langchain
 python-telegram-bot
 requests
 jq
+logtail-python
+Flask

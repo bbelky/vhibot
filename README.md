@@ -11,7 +11,7 @@ Find @BotFather on Telegram and follow the guide. Your main goal is to obtain an
 Go to OpenAI https://openai.com/, create an account, go to API, and get the API Key.
 
 ### Run the bot using Docker compose
-Clone the bot to your machine. It could be any Linux, Mac, or Windows (Docker must be installed and configured):
+Clone the bot to your machine. It could be any Linux, Mac, or Windows (Docker must be installed and configured https://docs.docker.com/engine/install/):
 
     git clone https://github.com/bbelky/vhibot.git 
 

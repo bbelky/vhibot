@@ -5,6 +5,7 @@ import logging
 from langchain_openai import OpenAIEmbeddings 
 from langchain_community.vectorstores import FAISS 
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders.merge import MergedDataLoader
@@ -21,32 +22,44 @@ bot_token = os.getenv("TELEGRAM_API_TOKEN")
 openai_token = os.getenv("OPENAI_API_KEY")
 model_name = os.getenv("MODEL_NAME")
 embeddings_name = os.getenv("EMB_MODEL_NAME")
-url1 = os.getenv("FILE1_PATH")
-url2 = os.getenv("FILE2_PATH")
+url = [os.getenv("FILE1_PATH"), os.getenv("FILE2_PATH")]
 load_type = os.getenv("LOAD_TYPE")
 betterstack_token = os.getenv("BETTERSTACK_TOKEN")
 
-#Load documents
-if load_type == "PDF":
-    loader1 = PyPDFLoader(url1)
-    loader2 = PyPDFLoader(url2)
-    loader_all = MergedDataLoader(loaders=[loader1, loader2])
-    pages = loader_all.load_and_split()
-elif load_type == "JSON":
-    req1 = requests.get(url1)
-    if url1.find('/'):
-       path1 = url1.rsplit('/', 1)[1]
-    with open(f'./json/{path1}', 'wb') as f:
-       f.write(req1.content)
-    req2 = requests.get(url2)
-    if url2.find('/'):
-       path2 = url2.rsplit('/', 1)[1]
-    with open(f'./json/{path2}', 'wb') as f:
-       f.write(req2.content)
-    loader = DirectoryLoader("json", glob='**/*.json', show_progress=True, loader_cls=JSONLoader, loader_kwargs = {'jq_schema':'.[]','text_content':False})
-    pages = loader.load()
+#Load documents from the provided links
+for x in range(len(url)): 
+  if url[x]:
+    req1 = requests.get(url[x])
+    if url[x].find('/'): 
+      path1 = url[x].rsplit('/', 1)[1]
+      if load_type == "PDF":
+        with open(f'./pdf/{path1}', 'wb') as f: 
+          f.write(req1.content)
+      elif load_type == "JSON":
+        with open(f'./json/{path1}', 'wb') as f: 
+          f.write(req1.content)
+  else: print('File '+ str(x) + ' does not exist')
 
+#Document loader
+if load_type == "PDF":
+  loader = PyPDFDirectoryLoader("pdf/")
+  pages = loader.load_and_split()
+elif load_type == "JSON":
+  loader = DirectoryLoader("json", glob='**/*.json', show_progress=True, loader_cls=JSONLoader, loader_kwargs = {'jq_schema':'.[]','text_content':False})
+  pages = loader.load()
+
+#Show number of pages
 print(len(pages))
+
+#BetterStack logger if token is provided
+if betterstack_token:
+  handler = LogtailHandler(source_token=betterstack_token)
+  logger = logging.getLogger(__name__)
+  logger.setLevel(logging.INFO)
+  logger.handlers = []
+  logger.addHandler(handler)
+  logger.info('bot_start')
+  print("betterstack is ready")
 
 #Create FAISS DB
 faissindex = FAISS.from_documents(pages, OpenAIEmbeddings())
@@ -72,28 +85,20 @@ prompt = PromptTemplate(
     template=template,
 )
 
-#BetterStack Logger
-handler = LogtailHandler(source_token=betterstack_token)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.handlers = []
-logger.addHandler(handler)
-logger.info('bot_start') 
-
 print("READY")
 
 async def start_command(update, context):
   # Implement the start response
     user = update.message.from_user
-    logger.info('start', extra={
+    if betterstack_token: logger.info('start', extra={
         'user': user['username'],
     }) 
     await update.message.reply_text('Welcome to the AI-powered Virtuozzo Hybrid Infrastructure Support Bot!\nExample:\nHow to configure Kubernetes storage class?')
 
 async def product_command(update, context):
-  # Implement the wiki response
+  # Implement the product response
     user = update.message.from_user
-    logger.info('product', extra={
+    if betterstack_token: logger.info('product', extra={
         'user': user['username'],
     }) 
     await update.message.reply_html(
@@ -104,7 +109,7 @@ async def product_command(update, context):
 async def wiki_command(update, context):
   # Implement the wiki response
     user = update.message.from_user
-    logger.info('wiki', extra={
+    if betterstack_token: logger.info('wiki', extra={
         'user': user['username'],
     }) 
     await update.message.reply_html(
@@ -114,9 +119,9 @@ async def wiki_command(update, context):
     )
 
 async def docs_command(update, context):
-  # Implement the wiki response
+  # Implement the docs response
     user = update.message.from_user
-    logger.info('docs', extra={
+    if betterstack_token: logger.info('docs', extra={
         'user': user['username'],
     }) 
     await update.message.reply_html(
@@ -130,9 +135,9 @@ async def docs_command(update, context):
     )
 
 async def support_command(update, context):
-  # Implement the wiki response
+  # Implement the support response
     user = update.message.from_user
-    logger.info('support', extra={
+    if betterstack_token: logger.info('support', extra={
         'user': user['username'],
     }) 
     await update.message.reply_html(
@@ -141,7 +146,7 @@ async def support_command(update, context):
         "<a href='https://www.virtuozzo.com/all-supported-products/severity-level-definitions/'>Priority Definitions</a>",
     )
 
-#handling chat message
+# Handling chat message with OpenAI
 async def handle_message(update, context):
   message = update.message.text
   chat_id = update.message.chat_id
@@ -153,8 +158,8 @@ async def handle_message(update, context):
     )
   print(cb)
 
-  #betterstack logs
-  logger.info('question', extra={
+  #send logs to BetterStack
+  if betterstack_token: logger.info('question', extra={
     'user': user['username'],
     'prompt': message,
     'answer': answer.get('result'),
